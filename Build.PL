@@ -1,0 +1,19 @@
+use strict;
+use warnings;
+use Module::Build;
+
+my $builder = Module::Build->new(
+    module_name         => 'POE::Filter::XML::RPC',
+    license             => 'gpl',
+    dist_author         => 'Nicholas R. Perez <nperez@cpan.org>',
+    dist_version_from   => 'lib/POE/Filter/XML/RPC.pm',
+	dist_abstract		=> 'A high level abstraction for (de)serializing XML-RPC requests',
+    build_requires => {
+        'Test::More'		=> 0,
+		'POE'				=> 0,
+		'POE::Filter::XML'	=> 0,
+    },
+    add_to_cleanup      => [ 'POE-Filter-XML-RPC-*' ],
+);
+
+$builder->create_build_script();
