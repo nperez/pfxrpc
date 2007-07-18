@@ -3,7 +3,7 @@ package POE::Filter::XML::RPC::Value::Array;
 use warnings;
 use strict;
 
-our @ISA = qw/ POE::Filter::XML::RPC::Value /;
+use base('POE::Filter::XML::RPC::Value');
 
 use constant 'id' => 4;
 

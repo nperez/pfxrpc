@@ -226,16 +226,20 @@ sub get_one()
 				
 			bless($node, 'XRPC::Response');
 			return [$node];
+		
+		} else {
+			
+			warn $node->to_str();
+
+			return 
+			[
+				XRPC::Fault->new
+				( 
+					101, 
+					'Malformed XML-RPC: Top level node is not valid'
+				)
+			];
 		}
-	
-		return 
-		[
-			XRPC::Fault->new
-			( 
-				101, 
-				'Malformed XML-RPC: Top level node is not valid'
-			)
-		];
 	
 	} else {
 
@@ -245,9 +249,16 @@ sub get_one()
 
 sub put()
 {
-	my ($self, $node) = @_;
+	my ($self, $nodes) = @_;
+	
+	my $ret = [];
 
-	return [bless($node, 'POE::Filter::XML::Node')];
+	foreach my $node (@$nodes)
+	{
+		push(@$ret, bless($node, 'POE::Filter::XML::Node'));
+	}
+	
+	return $ret;
 }
 
 1;

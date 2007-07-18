@@ -5,7 +5,7 @@ use strict;
 
 use constant 'TYPE' => 'base64';
 
-our @ISA = qw/ POE::Filter::XML::RPC::Value /;
+use base('POE::Filter::XML::RPC::Value');
 
 sub new()
 {

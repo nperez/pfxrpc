@@ -3,12 +3,11 @@ package POE::Filter::XML::RPC::Value::Struct;
 use warnings;
 use strict;
 
-use POE::Filter::XML::Node;
 use POE::Filter::XML::RPC::Value::StructMember;
 
-our @ISA = qw/ POE::Filter::XML::RPC::Value /;
-
 use constant 'TYPE' => 'struct';
+
+use base('POE::Filter::XML::RPC::Value');
 
 sub new()
 {
@@ -32,7 +31,7 @@ sub add_member()
 {
 	my ($self, $key, $value) = @_;
 	
-	my $member = $self->insert_tag(
+	my $member = $self->datatag()->insert_tag(
 		POE::Filter::XML::RPC::Value::StructMember->new($key, $value)
 	);
 
@@ -86,7 +85,12 @@ sub get_member()
 
 sub values()
 {
-	return shift(@_)->get_sort_children();
+	return shift(@_)->datatag()->get_sort_children();
+}
+
+sub datatag()
+{
+	return shift(@_)->get_tag(+TYPE);
 }
 
 1;

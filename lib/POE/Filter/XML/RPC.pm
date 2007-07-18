@@ -10,33 +10,82 @@ use POE::Filter::HTTPD;
 use POE::Filter::XML;
 use POE::Filter::XML::RPC::Guts;
 use POE::Filter::XML::RPC::HTTPShim;
+use Exporter;
 
-use base('POE::Filter::Stackable');
+use base('POE::Filter::Stackable', 'Exporter');
 
 use constant
 {
-	'BUFFER' => 0,
+	'BUFFER'	=> 0,
+	'HTTP'		=> 1,
+	'TCP'		=> 2,
 };
 
 our $VERSION = '0.01';
+our @EXPORT = 
+(
+	'TCP', 
+	'HTTP', 
+	'SERVER_MODE',
+	'CLIENT_MODE',
+);
 
 sub new()
-{
-	my ($class, $transport_type) = @_;
+{	
+	my $class = shift(@_);
 	
+	if(@_ & 1)
+	{
+		Carp::confess('Please provide an even number of arguments');
+	}
+
+	my $config = {};
+	
+	while($#_ != -1)
+	{
+		my $key = lc(shift(@_));
+		my $val = shift(@_);
+		$config->{$key} = $val;
+	}
+
 	my $self = [];
 	$self->[+BUFFER] = [];
 
 	bless($self, $class);
-	
-	if($transport_type eq 'HTTP')
+
+	unless($config->{'transport'})
 	{
-		$self->push(POE::Filter::HTTPD->new());
-		$self->push(POE::Filter::XML::RPC::HTTPShim->new());
+		$config->{'transport'} = +HTTP;
+	}
 	
-	} elsif($transport_type eq 'TCP') {
+	if($config->{'transport'} == +HTTP)
+	{
+		unless(exists($config->{'mode'}))
+		{
+			Carp::confess('Client/Server mode specification is required!');
+		}
+
+		$self->push(POE::Filter::HTTPD->new());
+		
+		$self->push
+		(
+			POE::Filter::XML::RPC::HTTPShim->new
+			(
+				'Mode'			=> $config->{'mode'},
+				'URI'			=> $config->{'uri'},
+				'HostHeader'	=> $config->{'hostheader'},
+				'UserAgent'		=> $config->{'useragent'},
+				'ServerHeader'	=> $config->{'serverheader'},
+			)
+		);
+	
+	} elsif($config->{'transport'} == +TCP) {
 		
 		$self->push(POE::Filter::Stream->new());
+	
+	} else {
+
+		Carp::confess('Unknown transport type!');
 	}
 	
 	#turn off streaming documents

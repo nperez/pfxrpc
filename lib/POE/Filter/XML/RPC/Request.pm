@@ -107,7 +107,7 @@ sub datatag()
 	return shift(@_)->get_tag('params');
 }
 
-sub wrap_val()
+sub wrap()
 {
 	my ($self, $val) = @_;
 

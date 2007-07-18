@@ -28,6 +28,8 @@ sub new()
 
 		$self->insert_tag(POE::Filter::XML::RPC::Value->new());
 	}
+
+	return $self;
 }
 
 sub key()

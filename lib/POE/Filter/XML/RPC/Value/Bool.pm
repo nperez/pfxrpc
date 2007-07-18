@@ -3,11 +3,9 @@ package POE::Filter::XML::RPC::Value::Bool;
 use warnings;
 use strict;
 
-use POE::Filter::XML::Node;
-
 use constant 'TYPE' => 'boolean';
 
-our @ISA = qw/ POE::Filter::XML::RPC::Value /;
+use base('POE::Filter::XML::RPC::Value');
 
 sub new()
 {
