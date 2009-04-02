@@ -27,18 +27,18 @@ sub value_process
 	my $type = 'string';
 	my $data;
 
-	my $children = $tag->get_sort_children();
+	my $children = [$tag->getChildrenByTagName('*')];
 
 	my $child = $children->[0];
 
 	if(defined($child))
 	{
-		$type = $child->name();
+		$type = $child->nodeName();
 
 		if($type eq 'array')
 		{
-			my $datatag = $child->get_tag('data');
-			my $values = $datatag->get_sort_children();
+			my $datatag = $child->getSingleChildByTagName('data');
+			my $values = $datatag->getChildrenByTagName('*');
 			
 			foreach my $value (@$values)
 			{	

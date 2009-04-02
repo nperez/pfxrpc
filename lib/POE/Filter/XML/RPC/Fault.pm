@@ -18,24 +18,24 @@ sub new()
 	$struct->add_member('faultCode', $int);
 	$struct->add_member('faultString', $message);
 
-	$self->insert_tag($struct);
+	$self->appendChild($struct);
 
 	return bless($self, $class);
 }
 
 sub code()
 {
-	return shift(@_)->struct()->get_member('faultCode')->value()->data();
+	return shift(@_)->struct()->get_member('faultCode')->value()->textContent();
 }
 
 sub string()
 {
-	return shift(@_)->struct()->get_member('faultString')->value()->data();
+	return shift(@_)->struct()->get_member('faultString')->value()->textContent();
 }
 
 sub struct()
 {
-	return shift(@_)->get_tag('value');
+	return shift(@_)->getSingleChildByTagName('value');
 }
 
 1;

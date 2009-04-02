@@ -12,8 +12,8 @@ sub new()
 	my ($class, $methodname, $params) = @_;
 
 	my $self = POE::Filter::XML::Node->new('methodCall');
-	$self->insert_tag('methodName');
-	$self->insert_tag('params');
+	$self->appendChild('methodName');
+	$self->appendChild('params');
 
 	bless($self, $class);
 
@@ -36,12 +36,12 @@ sub method_name()
 
 	if(defined($arg))
 	{
-		$self->get_tag('methodName')->data($arg);
+		$self->getSingleChildByTagName('methodName')->textContent($arg);
 		return $arg;
 	
 	} else {
 
-		return $self->get_tag('methodName')->data();
+		return $self->getSingleChildBTagName('methodName')->textContent();
 	}
 }
 
@@ -55,7 +55,7 @@ sub parameters()
 
 	foreach my $param (@$params)
 	{
-		push(@$values, $param->get_tag('value'));
+		push(@$values, $param->getSingleChildByTagName('value'));
 	}
 
 	return $values;
@@ -92,19 +92,19 @@ sub delete_parameter()
 {
 	my ($self, $index) = @_;
 
-	return $self->delete($index)->get_tag('value');
+	return $self->delete($index)->getSingleChildByTagName('value');
 }
 
 sub get_parameter()
 {
 	my ($self, $index) = @_;
 
-	return $self->get($index)->get_tag('value');
+	return $self->get($index)->getSingleChildByTagName('value');
 }
 
 sub datatag()
 {
-	return shift(@_)->get_tag('params');
+	return shift(@_)->getSingleChildByTagName('params');
 }
 
 sub wrap()
@@ -113,7 +113,7 @@ sub wrap()
 
 	my $param = POE::Filter::XML::Node->new('param');
 	
-	$param->insert_tag($val);
+	$param->appendChild($val);
 
 	return $param;
 }
