@@ -15,7 +15,7 @@ sub new()
 
 	my $self = $class->SUPER::new();
 
-	$self->insert_tag(+TYPE);
+	$self->appendChild(+TYPE);
 
 	bless($self, $class);
 
@@ -31,7 +31,7 @@ sub add_member()
 {
 	my ($self, $key, $value) = @_;
 	
-	my $member = $self->datatag()->insert_tag(
+	my $member = $self->datatag()->appendChild(
 		POE::Filter::XML::RPC::Value::StructMember->new($key, $value)
 	);
 
@@ -46,7 +46,7 @@ sub remove_member()
 
 	if(defined($member))
 	{
-		$member->detach();
+        $self->removeChild($member);
 	}
 
 	return $member;
@@ -74,7 +74,7 @@ sub get_member()
 
 	foreach my $child (@$children)
 	{
-		if($child->get_tag('name')->data() eq $key)
+		if($child->getSingleChildByTagName('name')->textContent() eq $key)
 		{
 			return $child;
 		}
@@ -85,12 +85,12 @@ sub get_member()
 
 sub values()
 {
-	return shift(@_)->datatag()->get_sort_children();
+	return shift(@_)->datatag()->getChildrenByTagName('*');
 }
 
 sub datatag()
 {
-	return shift(@_)->get_tag(+TYPE);
+	return shift(@_)->getSingleChildByTagName(+TYPE);
 }
 
 1;

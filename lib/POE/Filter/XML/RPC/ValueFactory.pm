@@ -1,6 +1,4 @@
 package POE::Filter::XML::RPC::ValueFactory;
-use Filter::Template;
-const XVal POE::Filter::XML::RPC::Value
 
 use warnings;
 use strict;
@@ -23,39 +21,9 @@ our @EXPORT = qw/ value_process base_process/;
 sub value_process
 {
 	my $tag = shift(@_);
-
 	my $type = 'string';
-	my $data;
-
-	my $children = [$tag->getChildrenByTagName('*')];
-
-	my $child = $children->[0];
-
-	if(defined($child))
-	{
-		$type = $child->nodeName();
-
-		if($type eq 'array')
-		{
-			my $datatag = $child->getSingleChildByTagName('data');
-			my $values = $datatag->getChildrenByTagName('*');
-			
-			foreach my $value (@$values)
-			{	
-				value_process($value);
-			}
-		
-		} elsif($type eq 'struct') {
-			
-			my $members = $child->get_sort_children();
-			
-			foreach my $member (@$members)
-			{	
-				value_process($member->get_tag('value'));
-				bless($member, 'XVal::StructMember');
-			}
-		}
-	}
+	my $child = [$tag->getChildrenByTagName('*')]->[0];
+	$type = $child->nodeName() if defined($child);
 	
 	return base_process($type, $tag);
 }
@@ -66,43 +34,43 @@ sub base_process
 
 	if($type eq 'i4' or $type eq 'int')
 	{
-		return bless($data,'XVal::Int');
+		return bless($data,'POE::Filter::XML::RPC::Value::Int');
 	
 	} elsif ($type eq 'string') {
 
-		return bless($data,'XVal::String');
+		return bless($data,'POE::Filter::XML::RPC::Value::String');
 
 	} elsif($type eq 'boolean') {
 		
-		return bless($data,'XVal::Bool');
+		return bless($data,'POE::Filter::XML::RPC::Value::Bool');
 
 	} elsif($type eq 'double') {
 
-		return bless($data,'XVal::Double');
+		return bless($data,'POE::Filter::XML::RPC::Value::Double');
 
 	} elsif($type eq 'dateTime.iso8601') {
 
-		return bless($data,'XVal::DateTime');
+		return bless($data,'POE::Filter::XML::RPC::Value::DateTime');
 	
 	} elsif($type eq 'base64') {
 
-		return bless($data,'XVal::Base64');
+		return bless($data,'POE::Filter::XML::RPC::Value::Base64');
 	
 	} elsif($type eq 'array') {
 		
-		return bless($data,'XVal::Array');
+		return bless($data,'POE::Filter::XML::RPC::Value::Array');
 
 	} elsif($type eq 'struct') {
 
-		return bless($data,'XVal::Struct');
+		return bless($data,'POE::Filter::XML::RPC::Value::Struct');
 	
 	} elsif(not defined($type) and defined($data)) {
 
-		return bless($data,'XVal::String');
+		return bless($data,'POE::Filter::XML::RPC::Value::String');
 	
 	} else {
 
-		return bless($data,'XVal::String');
+		return bless($data,'POE::Filter::XML::RPC::Value::String');
 	}
 }
 

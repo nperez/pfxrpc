@@ -5,8 +5,6 @@ use strict;
 
 use base('POE::Filter::XML::RPC::Value');
 
-use constant 'id' => 4;
-
 sub new()
 {
 	my ($class, $array) = @_;
@@ -15,7 +13,7 @@ sub new()
 
 	bless($self, $class);
 
-	$self->insert_tag('array')->insert_tag('data');
+	$self->appendChild('array')->appendChild('data');
 
 	foreach my $val (@$array)
 	{
@@ -29,31 +27,9 @@ sub add()
 {
 	my ($self, $val) = @_;
 	
-	my $children = $self->values();
-
 	my $data = $self->datatag();
-
-	if(@$children)
-	{
-		$val->[+id] = $#{$children} + 1;
-		$data->insert_tag($val);
+	$data->appendChild($val);
 	
-	} else {
-
-		$val->[+id] = 0;
-		$data->insert_tag($val);
-	}
-
-	return $val;
-}
-
-sub remove()
-{
-	my ($self, $val) = @_;
-	
-	$val->detach();
-	$self->_update_id();
-
 	return $val;
 }
 
@@ -68,19 +44,9 @@ sub insert()
 
 	my $data = $self->datatag();
 
-	$val->[+id] = $index;
+	my $refnode = $self->get($index - 1);
 
-	my $children = $self->values();
-
-	foreach my $child (@$children)
-	{
-		if($child->[+id] >= $index)
-		{
-			$child->[+id]++;
-		}
-	}
-
-	$data->insert_tag($val);
+	$data->insertAfter($val, $refnode);
 
 	return $val;
 }
@@ -95,17 +61,9 @@ sub delete()
 		Carp::confess('Index "' . $index . '" out of range!');
 	}
 
-	my $children = $self->values();
-	
-	foreach my $child (@$children)
-	{
-		if($child->[+id] == $index)
-		{
-			$child->detach();
-			$self->_update_id();
-			return $child;
-		}
-	}
+	my $child = [$self->values()]->[$index];
+    $self->removeChild($child);
+    return $child;
 }
 
 sub get()
@@ -117,30 +75,13 @@ sub get()
 		Carp::confess('Index "' . $index . '" out of range!');
 	}
 	
-	my $children = $self->values();
+	return [$self->values()]->[$index];
 	
-	foreach my $child (@$children)
-	{
-		if($child->[+id] == $index)
-		{
-			return $child;
-		}
-	}
 }
 
 sub values()
 {
-	return shift(@_)->datatag()->get_sort_children();
-}
-
-sub _update_id()
-{
-	my $values = shift(@_)->values();
-	
-	for(0..$#{$values})
-	{
-		$values->[$_]->[+id] = $_;
-	}
+	return shift(@_)->datatag()->getChildrenByTagName('*');
 }
 
 sub _check_index()
@@ -152,7 +93,7 @@ sub _check_index()
 
 sub datatag()
 {
-	return shift(@_)->get_tag('array')->get_tag('data');
+	return shift(@_)->getSingleChildByTagName('array')->getSingleChildByTagName('data');
 }
 
 1;

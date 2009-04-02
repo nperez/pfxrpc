@@ -13,7 +13,7 @@ sub new()
 
 	my $self = $class->SUPER::new();
 
-	$self->insert_tag(+TYPE)->data($arg);
+	$self->appendChild(+TYPE)->textContent($arg);
 
 	return bless($self, $class);
 }
@@ -24,11 +24,11 @@ sub value()
 	
 	if(defined($arg))
 	{
-		$self->get_tag(+TYPE)->data($arg);
+		$self->getSingleChildByTagName(+TYPE)->textContent($arg);
 	
 	} else {
 		
-		return $self->get_tag(+TYPE)->data();
+		return $self->getSingleChildByTagName(+TYPE)->textContent();
 	}
 }
 

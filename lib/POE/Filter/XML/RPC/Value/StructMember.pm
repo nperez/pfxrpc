@@ -13,20 +13,20 @@ sub new()
 
 	if(defined($key))
 	{
-		$self->insert_tag('name')->data($key);
+		$self->appendChild('name')->textContent($key);
 	
 	} else {
 
-		$self->insert_tag('name');
+		$self->appendChild('name');
 	}
 
 	if(defined($value))
 	{
-		$self->insert_tag($value);
+		$self->appendChild($value);
 	
 	} else {
 
-		$self->insert_tag(POE::Filter::XML::RPC::Value->new());
+		$self->appendChild(POE::Filter::XML::RPC::Value->new());
 	}
 
 	return $self;
@@ -34,12 +34,39 @@ sub new()
 
 sub key()
 {
-	return shift(@_)->get_tag('name')->data();
+    if(@_ > 1)
+    {
+        my ($self, $arg) = @_;
+        $self->getSingleChildByTagName('name')->textContent($arg);
+    }
+    else
+    {
+	    return shift(@_)->getSingleChildByTagName('name')->textContent();
+    }
 }
 
 sub value()
 {
-	return shift(@_)->get_tag('value');
+    if(@_ > 1)
+    {
+        my ($self, $arg) = @_;
+        my $val = $self->getSingleChildByTagName('value');
+        $self->removeChild($val);
+        
+        if(ref($arg) && $arg->isa('POE::Filter::XML::RPC::Value'))
+        {
+            $self->appendChild($arg);
+        }
+        else
+        {
+            #bleh need to write a value type guesser
+            $self->appendChild(POE::Filter::XML::RPC::Value::String->new($arg));
+        }
+    }
+    else
+    {
+	    return shift(@_)->getSingleChildByTagName('value');
+    }
 }
 
 
