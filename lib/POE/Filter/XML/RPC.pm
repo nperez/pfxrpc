@@ -1,4 +1,4 @@
-package POE::Filter::XML::RPC::Guts;
+package POE::Filter::XML::RPC;
 
 use POE::Filter::XML::RPC::Request;
 use POE::Filter::XML::RPC::Response;
@@ -13,6 +13,9 @@ use constant
 {
 	BUFFER => 0,
 };
+
+our $VERSION = '0.01';
+
 
 sub new()
 {

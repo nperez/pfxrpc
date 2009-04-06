@@ -2,8 +2,6 @@ Build.PL
 Changes
 lib/POE/Filter/XML/RPC.pm
 lib/POE/Filter/XML/RPC/Fault.pm
-lib/POE/Filter/XML/RPC/Guts.pm
-lib/POE/Filter/XML/RPC/HTTPShim.pm
 lib/POE/Filter/XML/RPC/Request.pm
 lib/POE/Filter/XML/RPC/Response.pm
 lib/POE/Filter/XML/RPC/Value.pm
@@ -21,6 +19,3 @@ MANIFEST
 META.yml			# Will be created by "make dist"
 README
 t/00-load.t
-t/boilerplate.t
-t/pod-coverage.t
-t/pod.t
