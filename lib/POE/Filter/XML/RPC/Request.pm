@@ -98,8 +98,8 @@ sub delete_parameter()
 sub get_parameter()
 {
 	my ($self, $index) = @_;
-
-	return $self->get($index)->getSingleChildByTagName('value');
+    
+	return bless($self->get($index)->getSingleChildByTagName('value'), 'POE::Filter::XML::RPC::Value');
 }
 
 sub datatag()

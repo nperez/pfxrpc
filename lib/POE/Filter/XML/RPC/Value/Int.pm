@@ -13,23 +13,7 @@ sub new()
 
 	my $self = $class->SUPER::new();
 
-	$self->appendChild(+TYPE)->textContent($arg);
-
 	return bless($self, $class);
-}
-
-sub value()
-{
-	my ($self, $arg) = @_;
-	
-	if(defined($arg))
-	{
-		$self->getSingleChildByTagName(+TYPE)->textContent($arg);
-	
-	} else {
-
-		return $self->getSingleChildByTagName(+TYPE)->textContent();
-	}
 }
 
 1;

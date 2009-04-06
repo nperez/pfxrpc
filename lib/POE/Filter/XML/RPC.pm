@@ -34,16 +34,19 @@ sub get_one_start()
 	{
 		push(@{$self->[+BUFFER]}, @$raw);
 	
-	} else {
+	} elsif(ref($raw) eq 'ARRAY') {
 
 		$self->[+BUFFER] = $raw;
 	}
+    else
+    {
+        $self->[+BUFFER] = [$raw];
+    }
 }
 
 sub get_one()
 {
 	my $self = shift(@_);
-	
 	my $node = shift(@{$self->[+BUFFER]});
 	
 
@@ -54,7 +57,7 @@ sub get_one()
 			my $children = $node->getChildrenHash();
 			if(exists($children->{'methodName'}))
 			{
-				my $data = $children->{'methodName'}->textContent();
+				my $data = $children->{'methodName'}->[0]->textContent();
 				if(!defined($data) and !length($data))
 				{
 					return 
@@ -88,10 +91,11 @@ sub get_one()
 			
 			} else {
 
-				my $params = $children->{'params'}->getChildrenByTagName('*');
+				my $params = [$children->{'params'}->[0]->getChildrenByTagName('*')];
 
 				foreach my $param (@$params)
 				{
+                    $param = ordain($param);
 					my $value = $param->getSingleChildByTagName('value');
 					
 					if(!defined($value))
@@ -130,7 +134,7 @@ sub get_one()
 			
 			} elsif(exists($children->{'params'})) {
 					
-				my $params = $children->{'params'}->getChildrenByTagName('*');
+				my $params = [$children->{'params'}->[0]->getChildrenByTagName('*')];
 
 				if(!@{$params})
 				{
@@ -148,6 +152,7 @@ sub get_one()
 
 				foreach my $param (@$params)
 				{
+                    $param = ordain($param);
 					my $value = $param->getSingleChildByTagName('value');
 
 					if($param->nodeName() ne 'param')
@@ -179,7 +184,7 @@ sub get_one()
 		
 			} elsif(exists($children->{'fault'})) {
 
-				my $fault = $children->{'fault'};
+				my $fault = $children->{'fault'}->[0];
 				my $value = $fault->getSingleChildByTagName('value');
 
 				my $struct = 
@@ -224,8 +229,6 @@ sub get_one()
 		
 		} else {
 			
-			warn $node->toString();
-
 			return 
 			[
 				POE::Filter::XML::RPC::Fault->new

@@ -3,6 +3,8 @@ package POE::Filter::XML::RPC::Value::Array;
 use warnings;
 use strict;
 
+use POE::Filter::XML::Node;
+
 use base('POE::Filter::XML::RPC::Value');
 
 sub new()
@@ -63,7 +65,7 @@ sub delete()
 
 	my $child = [$self->values()]->[$index];
     $self->removeChild($child);
-    return $child;
+    return ordain($child);
 }
 
 sub get()
@@ -75,7 +77,7 @@ sub get()
 		Carp::confess('Index "' . $index . '" out of range!');
 	}
 	
-	return [$self->values()]->[$index];
+	return ordain([$self->values()]->[$index]);
 	
 }
 
@@ -88,7 +90,7 @@ sub _check_index()
 {
 	my ($self, $index) = @_;
 	
-	return $index > 0 and $index <= $#{$self->values()} + 1;
+	return $index >= 0 and $index <= scalar($self->values());
 }
 
 sub datatag()

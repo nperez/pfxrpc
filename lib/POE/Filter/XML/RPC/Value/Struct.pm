@@ -31,9 +31,8 @@ sub add_member()
 {
 	my ($self, $key, $value) = @_;
 	
-	my $member = $self->datatag()->appendChild(
-		POE::Filter::XML::RPC::Value::StructMember->new($key, $value)
-	);
+    my $member = POE::Filter::XML::RPC::Value::StructMember->new($key, $value);
+	$self->datatag()->appendChild($member);
 
 	return $member;
 }
@@ -70,13 +69,13 @@ sub get_member()
 {
 	my ($self, $key) = @_;
 
-	my $children = $self->values();
+	my $children = $self->_values();
 
 	foreach my $child (@$children)
 	{
 		if($child->getSingleChildByTagName('name')->textContent() eq $key)
 		{
-			return $child;
+			return bless($child, __PACKAGE__);
 		}
 	}
 
@@ -85,7 +84,16 @@ sub get_member()
 
 sub values()
 {
-	return shift(@_)->datatag()->getChildrenByTagName('*');
+    my $self = shift(@_);
+    my $values = 
+        [ map { bless($_, __PACKAGE__) if defined $_; } 
+        $self->_values();
+	return $values;
+}
+
+sub _values()
+{
+    return shift(@_)->datatag()->getChildrenByTagName('*');
 }
 
 sub datatag()
