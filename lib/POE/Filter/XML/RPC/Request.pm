@@ -1,5 +1,6 @@
 package POE::Filter::XML::RPC::Request;
 
+use 5.010;
 use warnings;
 use strict;
 
@@ -10,7 +11,7 @@ use constant 'id' => 4;
 sub new()
 {
 	my ($class, $methodname, $params) = @_;
-
+$DB::single=1;
 	my $self = POE::Filter::XML::Node->new('methodCall');
 	$self->appendChild('methodName');
 	$self->appendChild('params');
@@ -36,7 +37,7 @@ sub method_name()
 
 	if(defined($arg))
 	{
-		$self->getSingleChildByTagName('methodName')->textContent($arg);
+		$self->getSingleChildByTagName('methodName')->appendText($arg);
 		return $arg;
 	
 	} else {
@@ -55,7 +56,25 @@ sub parameters()
 
 	foreach my $param (@$params)
 	{
-		push(@$values, $param->getSingleChildByTagName('value'));
+        my $val = $param->getSingleChildByTagName('value');
+        
+        given($val)
+        {
+            when($_->isa('POE::Filter::XML::RPC::Value::Array'))
+            {
+                bless($_, 'POE::Filter::XML::RPC::Value::Array');
+            }
+            when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
+            {
+                bless($_, 'POE::Filter::XML::RPC::Value::Struct');
+            }
+            default
+            {
+                return bless($_, 'POE::Filter::XML::RPC::Value');
+            }
+        }
+
+		push(@$values, $val);
 	}
 
 	return $values;
@@ -66,17 +85,22 @@ sub add_parameter()
 	my ($self, $val) = @_;
 
 	$self->add($self->wrap($val));
-
-	return $val;
-}
-
-sub remove_parameter()
-{
-	my ($self, $val) = @_;
-
-	$self->remove($self->wrap($val));
-
-	return $val;
+    
+    given($val)
+    {
+        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
+        }
+        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
+        }
+        default
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value');
+        }
+    }
 }
 
 sub insert_parameter()
@@ -85,21 +109,67 @@ sub insert_parameter()
 	
 	$self->insert($self->wrap($val), $index);
 
-	return $val;
+    given($val)
+    {
+        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
+        }
+        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
+        }
+        default
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value');
+        }
+    }
 }
 
 sub delete_parameter()
 {
 	my ($self, $index) = @_;
 
-	return $self->delete($index)->getSingleChildByTagName('value');
+	my $val = $self->delete($index)->getSingleChildByTagName('value');
+
+    given($val)
+    {
+        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
+        }
+        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
+        }
+        default
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value');
+        }
+    }
 }
 
 sub get_parameter()
 {
 	my ($self, $index) = @_;
     
-	return bless($self->get($index)->getSingleChildByTagName('value'), 'POE::Filter::XML::RPC::Value');
+	my $val = $self->get($index)->getSingleChildByTagName('value');
+    
+    given($val)
+    {
+        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
+        }
+        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
+        }
+        default
+        {
+            return bless($_, 'POE::Filter::XML::RPC::Value');
+        }
+    }
 }
 
 sub datatag()

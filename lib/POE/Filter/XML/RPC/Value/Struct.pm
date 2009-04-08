@@ -75,7 +75,7 @@ sub get_member()
 	{
 		if($child->getSingleChildByTagName('name')->textContent() eq $key)
 		{
-			return bless($child, __PACKAGE__);
+			return bless($child, 'POE::Filter::XML::RPC::Value::StructMember');
 		}
 	}
 
@@ -86,8 +86,10 @@ sub values()
 {
     my $self = shift(@_);
     my $values = 
-        [ map { bless($_, __PACKAGE__) if defined $_; } 
-        $self->_values();
+        [ 
+            map { bless($_, __PACKAGE__) if defined $_; } 
+            $self->_values()
+        ];
 	return $values;
 }
 
