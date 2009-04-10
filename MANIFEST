@@ -5,17 +5,8 @@ lib/POE/Filter/XML/RPC/Fault.pm
 lib/POE/Filter/XML/RPC/Request.pm
 lib/POE/Filter/XML/RPC/Response.pm
 lib/POE/Filter/XML/RPC/Value.pm
-lib/POE/Filter/XML/RPC/Value/Array.pm
-lib/POE/Filter/XML/RPC/Value/Base64.pm
-lib/POE/Filter/XML/RPC/Value/Bool.pm
-lib/POE/Filter/XML/RPC/Value/DateTime.pm
-lib/POE/Filter/XML/RPC/Value/Double.pm
-lib/POE/Filter/XML/RPC/Value/Int.pm
-lib/POE/Filter/XML/RPC/Value/String.pm
-lib/POE/Filter/XML/RPC/Value/Struct.pm
-lib/POE/Filter/XML/RPC/Value/StructMember.pm
-lib/POE/Filter/XML/RPC/ValueFactory.pm
 MANIFEST
 META.yml			# Will be created by "make dist"
 README
 t/00-load.t
+t/01-basic.t

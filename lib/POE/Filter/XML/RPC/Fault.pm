@@ -11,12 +11,8 @@ sub new()
 
 	my $self = $class->SUPER::new('fault');
 
-	my $struct = POE::Filter::XML::RPC::Value::Struct->new();
-	my $int = POE::Filter::XML::RPC::Value::Int->new($code);
-	my $message = POE::Filter::XML::RPC::Value::String->new($string);
-
-	$struct->add_member('faultCode', $int);
-	$struct->add_member('faultString', $message);
+    my $hash = {'faultCode' => $code, 'faultString' => $string};
+	my $struct = POE::Filter::XML::RPC::Value->new($hash);
 
 	$self->appendChild($struct);
 
@@ -25,17 +21,17 @@ sub new()
 
 sub code()
 {
-	return shift(@_)->struct()->get_member('faultCode')->value()->textContent();
+	return shift(@_)->struct()->value()->{'faultCode'};
 }
 
 sub string()
 {
-	return shift(@_)->struct()->get_member('faultString')->value()->textContent();
+	return shift(@_)->struct()->value()->{'faultString'};
 }
 
 sub struct()
 {
-	return shift(@_)->getSingleChildByTagName('value');
+	return bless(shift(@_)->getSingleChildByTagName('value'), 'POE::Filter::XML::RPC::Value');
 }
 
 1;

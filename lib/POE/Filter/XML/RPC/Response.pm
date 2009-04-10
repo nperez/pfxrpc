@@ -77,7 +77,7 @@ sub return_value()
 		{
 			if(my $param = $params->getSingleChildByTagName('param'))
 			{
-				return bless('POE::Filter::XML::RPC::Value', $param->getSingleChildByTagName('value'));
+				return bless($param->getSingleChildByTagName('value'), 'POE::Filter::XML::RPC::Value');
 			}
 		}
 

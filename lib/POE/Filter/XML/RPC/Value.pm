@@ -39,6 +39,7 @@ sub new
     register($val);
 
     $type{id($val)} = $force_type // determine_type($arg);
+    return $val;
 }
 
 sub process
@@ -62,10 +63,10 @@ sub process
         {
             my $struct = $val->appendChild(+STRUCT);
 
-            while(my ($key, $val) = each %$_)
+            while(my ($key, $val) = each %$arg)
             {
                 my $member = $struct->appendChild(+MEMBER);
-                $member->appendChild(+NAME);
+                $member->appendChild(+NAME)->appendText($key);
                 $member->appendChild(process($val));
             }
         }
@@ -84,20 +85,17 @@ sub value()
     
     if(defined($arg))
     {
+        $self->removeChild($self->firstChild());
         my $type = determine_type($arg);
-        $self->removeChild(($self->firstChild()));
         $self->appendChild($type)->appendText($arg);
+        $type{id($self)} = $type;
     }
     else
     {
-        my $content = $self->textContent();
-        if(defined($content))
+        my $content = $self->find('child::text()');
+        if(defined($content) && length($content))
         {
             return $content;
-        }
-        elsif(exists($type{id($self)}) && defined(my $valtype = $type{id($self)}))
-        {
-            return $self->getSingleChildByTagName($valtype)->textContent();
         }
         else
         {
@@ -110,8 +108,8 @@ sub node_to_value
 {
     my $node = shift(@_);
     
-    my $content = $node->textContent();
-    return $content if defined($content);
+    my $content = $node->find('child::text()');
+    return $content if defined($content) && length($content);
 
     my $val = $node->firstChild();
     given($val->nodeName())
@@ -121,7 +119,7 @@ sub node_to_value
             my $struct = {};
             foreach($node->getChildrenByTagName('member'))
             {
-                $struct->{($_->getChildrenByTagName('name'))[0]->textContent()} =
+                $struct->{$_->find('child::name/child::text()')} =
                     node_to_value(($_->getChildrenByTagName('value'))[0]);
             }
 
@@ -140,7 +138,7 @@ sub node_to_value
         }
         default
         {
-            return $val->textContent();
+            return $val->find('child::text()');
         }
     }
 }
@@ -151,9 +149,9 @@ sub type()
     
     if(!exists($type{id($self)}) || !defined($type{id($self)}))
     {
-        my $content = $self->textContent();
+        my $content = $self->find('child::text()');
         
-        if(defined($content))
+        if(defined($content) && length($content))
         {
             # string
             $type{id($self)} = +STRING;
@@ -195,11 +193,11 @@ sub determine_type($)
                 return +INT;
             }
         }
-        when(reftype($_) eq 'ARRAY')
+        when((reftype($_) // '') eq 'ARRAY')
         {
             return +ARRAY;
         }
-        when(reftype($_) eq 'HASH')
+        when((reftype($_) // '') eq 'HASH')
         {
             return +STRUCT;
         }

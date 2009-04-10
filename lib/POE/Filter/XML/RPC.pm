@@ -2,7 +2,6 @@ package POE::Filter::XML::RPC;
 
 use POE::Filter::XML::RPC::Request;
 use POE::Filter::XML::RPC::Response;
-use POE::Filter::XML::RPC::ValueFactory;
 use POE::Filter::XML::RPC::Fault;
 
 use POE::Filter::XML::Node;
@@ -115,7 +114,7 @@ sub get_one()
 			bless($node, 'POE::Filter::XML::RPC::Request');
 			return [$node];
 	
-		} elsif ($node->name() eq 'methodResponse') {
+		} elsif ($node->nodeName() eq 'methodResponse') {
 			
 			my $children = $node->getChildrenHash();
 
@@ -185,15 +184,9 @@ sub get_one()
 			} elsif(exists($children->{'fault'})) {
 
 				my $fault = $children->{'fault'}->[0];
-				my $value = $fault->getSingleChildByTagName('value');
+				my $struct = $fault->getSingleChildByTagName('value')->getSingleChildByTagName('struct');
 
-				my $struct = 
-					POE::Filter::XML::RPC::ValueFactory::value_process
-					(
-						$value
-					);
-
-				if(!$struct->isa('POE::Filter::XML::RPC::Value::Struct'))
+				if(!defined($struct))
 				{
 					return
 					[
@@ -206,8 +199,8 @@ sub get_one()
 					];
 				
 				} 
-				elsif(!defined($struct->get_member('faultCode')) or
-					!defined($struct->get_member('faultString')))
+				elsif(!defined($struct->getSingleChildByTagName('faultCode')) or
+					!defined($struct->getSingleChildByTagName('faultString')))
 				{
 					return
 					[

@@ -4,15 +4,15 @@ use 5.010;
 use warnings;
 use strict;
 
-use base('POE::Filter::XML::RPC::Value::Array');
+use POE::Filter::XML::Node;
 
-use constant 'id' => 4;
+use base('POE::Filter::XML::Node');
 
 sub new()
 {
 	my ($class, $methodname, $params) = @_;
-$DB::single=1;
-	my $self = POE::Filter::XML::Node->new('methodCall');
+	
+    my $self = POE::Filter::XML::Node->new('methodCall');
 	$self->appendChild('methodName');
 	$self->appendChild('params');
 
@@ -57,23 +57,7 @@ sub parameters()
 	foreach my $param (@$params)
 	{
         my $val = $param->getSingleChildByTagName('value');
-        
-        given($val)
-        {
-            when($_->isa('POE::Filter::XML::RPC::Value::Array'))
-            {
-                bless($_, 'POE::Filter::XML::RPC::Value::Array');
-            }
-            when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
-            {
-                bless($_, 'POE::Filter::XML::RPC::Value::Struct');
-            }
-            default
-            {
-                return bless($_, 'POE::Filter::XML::RPC::Value');
-            }
-        }
-
+        bless($val, 'POE::Filter::XML::RPC::Value');
 		push(@$values, $val);
 	}
 
@@ -86,21 +70,7 @@ sub add_parameter()
 
 	$self->add($self->wrap($val));
     
-    given($val)
-    {
-        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
-        }
-        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
-        }
-        default
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value');
-        }
-    }
+    return bless($val, 'POE::Filter::XML::RPC::Value');
 }
 
 sub insert_parameter()
@@ -109,21 +79,7 @@ sub insert_parameter()
 	
 	$self->insert($self->wrap($val), $index);
 
-    given($val)
-    {
-        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
-        }
-        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
-        }
-        default
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value');
-        }
-    }
+    return bless($val, 'POE::Filter::XML::RPC::Value');
 }
 
 sub delete_parameter()
@@ -132,21 +88,7 @@ sub delete_parameter()
 
 	my $val = $self->delete($index)->getSingleChildByTagName('value');
 
-    given($val)
-    {
-        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
-        }
-        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
-        }
-        default
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value');
-        }
-    }
+    return bless($val, 'POE::Filter::XML::RPC::Value');
 }
 
 sub get_parameter()
@@ -155,26 +97,36 @@ sub get_parameter()
     
 	my $val = $self->get($index)->getSingleChildByTagName('value');
     
-    given($val)
-    {
-        when($_->isa('POE::Filter::XML::RPC::Value::Array'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Array');
-        }
-        when($_->isa('POE::Filter::XML::RPC::Value::Struct'))
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value::Struct');
-        }
-        default
-        {
-            return bless($_, 'POE::Filter::XML::RPC::Value');
-        }
-    }
+    return bless($val, 'POE::Filter::XML::RPC::Value');
 }
 
 sub datatag()
 {
-	return shift(@_)->getSingleChildByTagName('params');
+	return ordain(shift(@_)->getSingleChildByTagName('params'));
+}
+
+sub add()
+{
+    my ($self, $val) = @_;
+    ordain($self->datatag()->appendChild($val));
+}
+
+sub delete()
+{
+    my ($self, $index) = @_;
+    return ordain($self->datatag()->removeChild($self->get($index)));
+}
+
+sub insert()
+{
+    my ($self, $val, $index) = @_;
+    return ordain($self->datatag()->insertBefore($self->get($index)));
+}
+
+sub get()
+{
+    my ($self, $index) = @_;
+    return ordain(($self->datatag()->getChildrenByTagName('*'))[$index]);
 }
 
 sub wrap()
