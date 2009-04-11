@@ -7,6 +7,7 @@ use strict;
 use base('POE::Filter::XML::Node', 'Exporter');
 use Class::InsideOut(':std');
 use Scalar::Util('looks_like_number', 'reftype');
+use Regexp::Common('time');
 
 use constant 
 {
@@ -92,7 +93,7 @@ sub value()
     }
     else
     {
-        my $content = $self->find('child::text()');
+        my $content = $self->findvalue('child::text()');
         if(defined($content) && length($content))
         {
             return $content;
@@ -108,7 +109,7 @@ sub node_to_value
 {
     my $node = shift(@_);
     
-    my $content = $node->find('child::text()');
+    my $content = $node->findvalue('child::text()');
     return $content if defined($content) && length($content);
 
     my $val = $node->firstChild();
@@ -117,10 +118,10 @@ sub node_to_value
         when(+STRUCT)
         {
             my $struct = {};
-            foreach($node->getChildrenByTagName('member'))
+            foreach($val->findnodes('child::member'))
             {
-                $struct->{$_->find('child::name/child::text()')} =
-                    node_to_value(($_->getChildrenByTagName('value'))[0]);
+                $struct->{$_->findvalue('child::name/child::text()')} =
+                    node_to_value(($_->findnodes('child::value'))[0]);
             }
 
             return $struct;
@@ -129,7 +130,7 @@ sub node_to_value
         {
             my $array = [];
 
-            foreach($node->firstChild()->getChildrenByTagName('value'))
+            foreach($val->findnodes('child::data/child::value'))
             {
                 push(@$array, node_to_value($_));
             }
@@ -138,7 +139,7 @@ sub node_to_value
         }
         default
         {
-            return $val->find('child::text()');
+            return $val->findvalue('child::text()');
         }
     }
 }
@@ -146,10 +147,10 @@ sub node_to_value
 sub type()
 {
     my $self = shift(@_);
-    
+   $DB::single = 1; 
     if(!exists($type{id($self)}) || !defined($type{id($self)}))
     {
-        my $content = $self->find('child::text()');
+        my $content = $self->findvalue('child::text()');
         
         if(defined($content) && length($content))
         {
@@ -178,7 +179,7 @@ sub determine_type($)
         {
             return +BASE64;
         }
-        when(/^(?:1|0){1}|true|false$/i)
+        when(/^(?:1|0){1}$|^true$|^false$/i)
         {
             return +BOOL;
         }
@@ -200,6 +201,10 @@ sub determine_type($)
         when((reftype($_) // '') eq 'HASH')
         {
             return +STRUCT;
+        }
+        when($_ =~ $RE{'time'}{'iso'})
+        {
+            return +DATETIME;
         }
         default
         {

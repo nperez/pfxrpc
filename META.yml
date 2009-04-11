@@ -6,10 +6,11 @@ author:
 abstract: A high level abstraction for (de)serializing XML-RPC requests
 license: gpl
 resources:
-  license: http://www.opensource.org/licenses/gpl-license.php
+  license: http://opensource.org/licenses/gpl-license.php
 build_requires:
   POE: 0
   POE::Filter::XML: 0
+  Regexp::Common::time: 0
   Test::More: 0
 provides:
   POE::Filter::XML::RPC:
@@ -17,37 +18,13 @@ provides:
     version: 0.01
   POE::Filter::XML::RPC::Fault:
     file: lib/POE/Filter/XML/RPC/Fault.pm
-  POE::Filter::XML::RPC::Guts:
-    file: lib/POE/Filter/XML/RPC/Guts.pm
-  POE::Filter::XML::RPC::HTTPShim:
-    file: lib/POE/Filter/XML/RPC/HTTPShim.pm
   POE::Filter::XML::RPC::Request:
     file: lib/POE/Filter/XML/RPC/Request.pm
   POE::Filter::XML::RPC::Response:
     file: lib/POE/Filter/XML/RPC/Response.pm
   POE::Filter::XML::RPC::Value:
     file: lib/POE/Filter/XML/RPC/Value.pm
-  POE::Filter::XML::RPC::Value::Array:
-    file: lib/POE/Filter/XML/RPC/Value/Array.pm
-  POE::Filter::XML::RPC::Value::Base64:
-    file: lib/POE/Filter/XML/RPC/Value/Base64.pm
-  POE::Filter::XML::RPC::Value::Bool:
-    file: lib/POE/Filter/XML/RPC/Value/Bool.pm
-  POE::Filter::XML::RPC::Value::DateTime:
-    file: lib/POE/Filter/XML/RPC/Value/DateTime.pm
-  POE::Filter::XML::RPC::Value::Double:
-    file: lib/POE/Filter/XML/RPC/Value/Double.pm
-  POE::Filter::XML::RPC::Value::Int:
-    file: lib/POE/Filter/XML/RPC/Value/Int.pm
-  POE::Filter::XML::RPC::Value::String:
-    file: lib/POE/Filter/XML/RPC/Value/String.pm
-  POE::Filter::XML::RPC::Value::Struct:
-    file: lib/POE/Filter/XML/RPC/Value/Struct.pm
-  POE::Filter::XML::RPC::Value::StructMember:
-    file: lib/POE/Filter/XML/RPC/Value/StructMember.pm
-  POE::Filter::XML::RPC::ValueFactory:
-    file: lib/POE/Filter/XML/RPC/ValueFactory.pm
-generated_by: Module::Build version 0.2807
+generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

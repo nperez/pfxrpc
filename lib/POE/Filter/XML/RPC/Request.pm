@@ -37,31 +37,18 @@ sub method_name()
 
 	if(defined($arg))
 	{
-		$self->getSingleChildByTagName('methodName')->appendText($arg);
+		($self->findnodes('child::methodName'))[0]->appendText($arg);
 		return $arg;
 	
 	} else {
 
-		return $self->getSingleChildBTagName('methodName')->textContent();
+		return $self->findvalue('child::methodName/child::text()');
 	}
 }
 
 sub parameters()
 {
-	my $self = shift(@_);
-
-	my $params = $self->values();
-
-	my $values = [];
-
-	foreach my $param (@$params)
-	{
-        my $val = $param->getSingleChildByTagName('value');
-        bless($val, 'POE::Filter::XML::RPC::Value');
-		push(@$values, $val);
-	}
-
-	return $values;
+	return [ map { bless($_, 'POE::Filter::XML::RPC::Value') } shift(@_)->findnodes('child::params/child::param/child::value') ];
 }
 
 sub add_parameter()
@@ -86,7 +73,7 @@ sub delete_parameter()
 {
 	my ($self, $index) = @_;
 
-	my $val = $self->delete($index)->getSingleChildByTagName('value');
+	my $val = ($self->delete($index)->findnodes('child::value'))[0];
 
     return bless($val, 'POE::Filter::XML::RPC::Value');
 }
@@ -95,38 +82,33 @@ sub get_parameter()
 {
 	my ($self, $index) = @_;
     
-	my $val = $self->get($index)->getSingleChildByTagName('value');
+	my $val = ($self->get($index)->findnodes('child::value'))[0];
     
     return bless($val, 'POE::Filter::XML::RPC::Value');
-}
-
-sub datatag()
-{
-	return ordain(shift(@_)->getSingleChildByTagName('params'));
 }
 
 sub add()
 {
     my ($self, $val) = @_;
-    ordain($self->datatag()->appendChild($val));
+    return ($self->findnodes('child::params'))[0]->appendChild($val);
 }
 
 sub delete()
 {
     my ($self, $index) = @_;
-    return ordain($self->datatag()->removeChild($self->get($index)));
+    return ($self->findnodes('child::params'))[0]->removeChild($self->get($index));
 }
 
 sub insert()
 {
     my ($self, $val, $index) = @_;
-    return ordain($self->datatag()->insertBefore($self->get($index)));
+    return ($self->findnodes('child::params'))[0]->insertBefore($val, $self->get($index));
 }
 
 sub get()
 {
     my ($self, $index) = @_;
-    return ordain(($self->datatag()->getChildrenByTagName('*'))[$index]);
+    return ($self->findnodes("child::params/child::param[position()=$index]"))[0];
 }
 
 sub wrap()

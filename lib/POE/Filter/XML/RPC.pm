@@ -53,19 +53,20 @@ sub get_one()
 	{
 		if($node->nodeName() eq 'methodCall')
 		{
-			my $children = $node->getChildrenHash();
-			if(exists($children->{'methodName'}))
+			if($node->exists('child::methodName'))
 			{
-				my $data = $children->{'methodName'}->[0]->textContent();
-				if(!defined($data) and !length($data))
+				if(!$node->exists('child::methodName/child::text()'))
 				{
 					return 
 					[
-						POE::Filter::XML::RPC::Fault->new
-						(
-							102,
-							'Malformed XML-RPC: No methodName data defined'
-						)
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                102,
+                                'Malformed XML-RPC: No methodName data defined'
+                            )
+                        )
 					];
 				}
 			
@@ -73,162 +74,190 @@ sub get_one()
 
 				return
 				[
-					POE::Filter::XML::RPC::Fault->new
-					(
-						103,
-						'Malformed XML-RPC: No methodName child tag present'
-					)
+                    POE::Filter::XML::RPC::Response->new
+                    (
+                        POE::Filter::XML::RPC::Fault->new
+                        (
+                            103,
+                            'Malformed XML-RPC: No methodName child tag present'
+                        )
+                    )
 				];
 			}
 			
 			# params are optional, but let's be consistent for the
 			# Request code's sake.
 
-			if(!exists($children->{'params'}))
+			if(!$node->exists('child::params'))
 			{
 				$node->appendChild('params');
 			
 			} else {
+                
+                my $params =()= $node->findnodes('child::params/child::param');
+                my $vals =()= $node->findnodes('child::params/child::param/child::value');
 
-				my $params = [$children->{'params'}->[0]->getChildrenByTagName('*')];
-
-				foreach my $param (@$params)
-				{
-                    $param = ordain($param);
-					my $value = $param->getSingleChildByTagName('value');
-					
-					if(!defined($value))
-					{
-						return
-						[
-							POE::Filter::XML::RPC::Fault->new
-							(
-								110,
-								'Malformed XML-RPC: No value tag within param'
-							)
-						];
-					}
-				}
+                if($vals < $params)
+                {
+                    return
+                    [
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                110,
+                                'Malformed XML-RPC: No value tag within param'
+                            )
+                        )
+                    ];
+                }
 			}
 					
-			bless($node, 'POE::Filter::XML::RPC::Request');
-			return [$node];
+			return [bless($node, 'POE::Filter::XML::RPC::Request')];
 	
 		} elsif ($node->nodeName() eq 'methodResponse') {
 			
-			my $children = $node->getChildrenHash();
-
-			if(!exists($children->{'params'}) and 
-				!exists($children->{'fault'}))
-			{
+			if(!$node->exists('child::params') and !$node->exists('child::fault'))
+            {
 				return
 				[
-					POE::Filter::XML::RPC::Fault->new
-					(
-						104,
-						'Malformed XML-RPC: Response does not contain ' .	
-						'parameters or a fault object'
-					)
+                    POE::Filter::XML::RPC::Response->new
+                    (
+                        POE::Filter::XML::RPC::Fault->new
+                        (
+                            104,
+                            'Malformed XML-RPC: Response does not contain ' .	
+                            'parameters or a fault object'
+                        )
+                    )
 				]
 			
-			} elsif(exists($children->{'params'})) {
+			} elsif($node->exists('child::params')) {
 					
-				my $params = [$children->{'params'}->[0]->getChildrenByTagName('*')];
+				my $params =()= $node->findnodes('child::params/child::param');
 
-				if(!@{$params})
+				if(!$params)
 				{
 					return
 					[
-						POE::Filter::XML::RPC::Fault->new
-						(
-							105,
-							'Malformed XML-RPC: Return parameters does ' .
-							'not contain any param children'
-						)
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                105,
+                                'Malformed XML-RPC: Return parameters does ' .
+                                'not contain any param children'
+                            )
+                        )
 					];
 				
 				} 
+                
+                my $node_count =()= $node->findnodes('child::params/child::*');
+                
+                if($node_count > $params)
+                {
+                    return
+                    [
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                108,
+                                'Malformed XML-RPC: Params object ' .
+                                'contains children other than param'
+                            )
+                        )
+                    ];
+                }
 
-				foreach my $param (@$params)
-				{
-                    $param = ordain($param);
-					my $value = $param->getSingleChildByTagName('value');
-
-					if($param->nodeName() ne 'param')
-					{
-						return
-						[
-							POE::Filter::XML::RPC::Fault->new
-							(
-								108,
-								'Malformed XML-RPC: Params object ' .
-								'contains children other than param'
-							)
-						];
-					}
-
-					if(!defined($value))
-					{
-						return
-						[
-							POE::Filter::XML::RPC::Fault->new
-							(
-								109,
-								'Malformed XML-RPC: Param child does '.
-								'not contain a value object'
-							)
-						];
-					}
-				}
+                my $value_count =()= $node->findnodes('child::params/child::param/child::value');
+				
+                if($value_count < $params)
+                {
+                    return
+                    [
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                109,
+                                'Malformed XML-RPC: Param child does '.
+                                'not contain a value object'
+                            )
+                        )
+                    ];
+                }
 		
-			} elsif(exists($children->{'fault'})) {
+			} elsif($node->exists('child::fault')) {
 
-				my $fault = $children->{'fault'}->[0];
-				my $struct = $fault->getSingleChildByTagName('value')->getSingleChildByTagName('struct');
-
-				if(!defined($struct))
+                if(!$node->exists('child::fault/child::value'))
+                {
+					return
+					[
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                106,
+                                'Malformed XML-RPC: Fault value is not a ' .
+                                'valid struct object'
+                            )
+                        )
+					];
+                }
+                
+				if(!$node->exists('child::fault/child::value/child::struct'))
 				{
 					return
 					[
-						POE::Filter::XML::RPC::Fault->new
-						(
-							106,
-							'Malformed XML-RPC: Fault value is not a ' .
-							'valid struct object'
-						)
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                106,
+                                'Malformed XML-RPC: Fault value is not a ' .
+                                'valid struct object'
+                            )
+                        )
 					];
 				
 				} 
-				elsif(!defined($struct->getSingleChildByTagName('faultCode')) or
-					!defined($struct->getSingleChildByTagName('faultString')))
-				{
-					return
-					[
-						POE::Filter::XML::RPC::Fault->new
-						(
-							107,
-							'Malformed XML-RPC: Fault value does not ' . 
-							'contain either a fault code or fault string'
-						)
-					];
-				}
+                
+                my $code = $node->findvalue('child::fault/child::value/child::struct/child::member[child::name/child::text() = "faultCode"]/child::value/child::*/child::text()');
+                my $string = $node->findvalue('child::fault/child::value/child::struct/child::member[child::name/child::text() = "faultString"]/child::value/child::*/child::text()');
 
-				bless($fault, 'POE::Filter::XML::RPC::Fault');
-                return [$fault];
+                if(!defined($code) or !defined($string) or !length($code) or !length($string))
+                {
+                    return
+                    [
+                        POE::Filter::XML::RPC::Response->new
+                        (
+                            POE::Filter::XML::RPC::Fault->new
+                            (
+                                107,
+                                'Malformed XML-RPC: Fault value does not ' . 
+                                'contain either a fault code or fault string'
+                            )
+                        )
+                    ];
+                }
 			}
 				
-			bless($node, 'POE::Filter::XML::RPC::Response');
-			return [$node];
+			return [bless($node, 'POE::Filter::XML::RPC::Response')];
 		
 		} else {
 			
 			return 
 			[
-				POE::Filter::XML::RPC::Fault->new
-				( 
-					101, 
-					'Malformed XML-RPC: Top level node is not valid'
-				)
+                POE::Filter::XML::RPC::Response->new
+                (
+                    POE::Filter::XML::RPC::Fault->new
+                    ( 
+                        101, 
+                        'Malformed XML-RPC: Top level node is not valid'
+                    )
+                )
 			];
 		}
 	

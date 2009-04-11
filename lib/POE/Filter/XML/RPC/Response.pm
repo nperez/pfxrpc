@@ -30,7 +30,7 @@ sub fault()
 {
 	my ($self, $arg) = @_;
 
-    my $fault = $self->getSingleChildByTagName('fault');
+    my $fault = ($self->findnodes('child::fault'))[0];
 
 	if(defined($arg))
 	{	
@@ -49,7 +49,7 @@ sub fault()
 	} else {
         
         return undef if not defined $fault;
-		return bless('POE::Filter::XML::RPC::Fault', $self->getSingleChildByTagName('fault'));
+		return bless($fault, 'POE::Filter::XML::RPC::Fault');
 	}
 
 }
@@ -60,28 +60,25 @@ sub return_value()
 	
 	if(defined($arg))
 	{
-		if(!defined($self->getSingleChildByTagName('params')))
+		if(!$self->exists('child::params'))
 		{
 			$self->appendChild('params')->appendChild('param')->appendChild($arg);
 		
 		} else {
 	
-			$self->getSingleChildByTagName('params')->getSingleChildByTagName('param')->appendChild($arg);
+			($self->findnodes('child::params/child::param'))[0]->appendChild($arg);
 		}
 
 		return $arg;
 	
 	} else {
+        
+		if(my $value = ($self->findnodes('child::params/child::param/child::value'))[0])
+        {
+            return bless($value, 'POE::Filter::XML::RPC::Value');
+        }
 
-		if(my $params = $self->getSingleChildByTagName('params'))
-		{
-			if(my $param = $params->getSingleChildByTagName('param'))
-			{
-				return bless($param->getSingleChildByTagName('value'), 'POE::Filter::XML::RPC::Value');
-			}
-		}
-
-		return undef;
+        return undef;
 	}
 }
 
