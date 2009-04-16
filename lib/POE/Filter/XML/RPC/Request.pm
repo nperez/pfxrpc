@@ -121,4 +121,31 @@ sub wrap()
 
 	return $param;
 }
+
+=pod
+
+=head1 NAME
+
+POE::Filter::XML::RPC::Request - An abstracted XMLRPC request
+
+=head1 SYNOPSIS
+
+    use 5.010;
+    use POE::Filter::XML::RPC::Request;
+    use POE::Filter::XML::RPC::Value;
+
+    my $request = POE::Filter::XML::RPC::Request->new
+    (
+        'SomeRemoteMethod',
+        [
+            POE::Filter::XML::RPC::Value->new('Some Argument')
+        ]
+    );
+
+    say $request->method_name(); # SomeRemoteMethod
+    say $request->get_parameter(1)->value(); # Some Argument
+
+
+=cut
+
 1;

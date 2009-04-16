@@ -36,6 +36,10 @@ sub fault()
 	{	
 		if(!defined($fault))
 		{
+            if($self->exists('child::params'))
+            {
+                $self->removeChild($self->firstChild());
+            }
 			$self->appendChild($arg);
 		
 		} else {
@@ -62,6 +66,10 @@ sub return_value()
 	{
 		if(!$self->exists('child::params'))
 		{
+            if($self->exists('child::fault'))
+            {
+                $self->removeChild($self->firstChild());
+            }
 			$self->appendChild('params')->appendChild('param')->appendChild($arg);
 		
 		} else {
@@ -81,5 +89,67 @@ sub return_value()
         return undef;
 	}
 }
+
+=pod
+
+=head1 NAME
+
+POE::Filter::XML::RPC::Response - An abstracted XMLRPC response
+
+=head1 SYNOPSIS
+
+    use 5.010;
+    use POE::Filter::XML::RPC::Response;
+    use POE::Filter::XML::RPC::Value;
+
+    my $response = POE::Filter::XML::RPC::Response->new
+    (
+        POE::Filter::XML::RPC::Value->new('Okay!');
+    )
+
+    say $response->return_value()->value() # Okay!
+
+=head1 DESCRIPTION
+
+POE::Filter::XML::RPC::Reponse provides a simple class for generating XMLRPC
+responses. 
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item new()
+
+new() takes a single argument that can either be a POE::Filter::XML::RPC::Value
+object or it can be a POE::Filter::XML::RPC::Fault object.
+
+=item fault()
+
+If the response contains a Fault object, it will be returned. May also take a 
+single argument of another Fault object. In that case, any previous Fault 
+object will be replaced with the provided. Also, if the response contained a 
+valid return Value, it will be replaced by the Fault.
+
+=item return_value()
+
+If the response contains a return Value, it will be returned. May also take a 
+single argument of another Value object. In that case, any previous Value 
+object will be replaced with the provided. Also, if the response contained a 
+Fault, it will be replaced by the Value.
+
+=head1 NOTES
+
+Response is actually a subclass of POE::Filter::XML::Node and so all of its
+methods, including XML::LibXML::Element's, are available for use. This could 
+ultimately be useful to avoid marshalling all of the data out of the Node and
+instead apply an XPATH expression to target specifically what is desired deep
+within a nested structure.
+
+=head1 AUTHOR
+
+Copyright 2009 Nicholas Perez.
+Licensed and distributed under the GPL.
+
+=cut
 
 1;

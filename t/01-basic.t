@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 77;
+use Test::More tests => 79;
 
 BEGIN
 {
@@ -40,6 +40,12 @@ my $response_fault = POE::Filter::XML::RPC::Response->new
         'MY FAULT'
     )
 );
+
+my $forced_type_val = POE::Filter::XML::RPC::Value->new(42, +STRING);
+is($forced_type_val->type(), +STRING, 'Forced type value 1/2');
+
+$forced_type_val->value('1234', +INT);
+is($forced_type_val->type(), +INT, 'Forced type value 2/2');
 
 is($request->method_name(), 'MYMETHODNAME', 'Method name');
 
