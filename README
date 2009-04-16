@@ -46,6 +46,8 @@ NOTES
     is not accounted for within this filter and in fact, only concerns
     itself with POE::Filter::XML::Nodes received or sent.
 
+    [1]: http://www.xmlrpc.com/spec
+
 AUTHOR
     Copyright 2009 Nicholas Perez. Licensed and distributed under the GPL.
 
