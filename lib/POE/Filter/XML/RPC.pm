@@ -1,4 +1,4 @@
-package POE::Filter::XML::RPC;
+package POE::Filter::XML::RPC::Guts;
 
 use POE::Filter::XML::RPC::Request;
 use POE::Filter::XML::RPC::Response;
@@ -287,7 +287,7 @@ sub put()
 
 POE::Filter::XML::RPC - A POE Filter for marshalling XML-RPC
 
-=head1 SYNOPSIS
+				my $params = $children->{'params'}->getChildrenByTagName('*');
 
     use POE::Filter::XML::RPC;
     use POE::Filter::XML::RPC::Request;
