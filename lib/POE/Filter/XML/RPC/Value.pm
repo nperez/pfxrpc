@@ -142,6 +142,10 @@ sub node_to_value
             return $val->findvalue('child::text()');
         }
     }
+	
+    $self->appendChild($type)->appendText($arg);
+    
+	return $self;
 }
 
 sub type()
