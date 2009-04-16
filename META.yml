@@ -12,6 +12,7 @@ build_requires:
   POE::Filter::XML: 0
   Regexp::Common::time: 0
   Test::More: 0
+  perl: 5.01
 provides:
   POE::Filter::XML::RPC:
     file: lib/POE/Filter/XML/RPC.pm
