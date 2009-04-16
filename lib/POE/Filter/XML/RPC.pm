@@ -336,6 +336,8 @@ This filter only implements part of the XMLRPC spec[1], the HTTP portion is not
 accounted for within this filter and in fact, only concerns itself with 
 POE::Filter::XML::Nodes received or sent.
 
+[1]: http://www.xmlrpc.com/spec
+
 =head1 AUTHOR
 
 Copyright 2009 Nicholas Perez.
