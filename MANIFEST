@@ -1,5 +1,5 @@
 Build.PL
-Changes
+ChangeLog
 lib/POE/Filter/XML/RPC.pm
 lib/POE/Filter/XML/RPC/Fault.pm
 lib/POE/Filter/XML/RPC/Request.pm

@@ -8,6 +8,8 @@ use POE::Filter::XML::Node;
 
 use base('POE::Filter::XML::Node');
 
+our $VERSION = '0.01';
+
 sub new()
 {
 	my ($class, $methodname, $params) = @_;
@@ -145,6 +147,69 @@ POE::Filter::XML::RPC::Request - An abstracted XMLRPC request
     say $request->method_name(); # SomeRemoteMethod
     say $request->get_parameter(1)->value(); # Some Argument
 
+=head1 DESCRIPTION
+
+POE::Filter::XML::RPC::Request provides and abstracted XMLRPC request object
+to use when constructing requests to a remote server.
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item new()
+
+new() accepts two arguments, one, the method name to be used, and two, an array
+reference of POE::Filter::XML::RPC::Value objects that are the positional
+arguments to the method in question. 
+
+=item method_name()
+
+method_name() returns the current method name of the request. Can also take an
+argument that will change the method name to the provided argument.
+
+=item parameters()
+
+parameters() returns an array reference of all of the Values currently stored
+in the request in the order they were provided. This is a zero based array.
+
+=item get_parameter()
+
+get_parameter() takes a one based index into the positional parameters of the 
+request. Returns the Value object at that position.
+
+=item insert_parameter()
+
+insert_parameter() takes two arguments, one, the Value object to be inserted and
+two, the one based index to which the Value should be associated.
+
+=item delete_parameter()
+
+delete_parameter() takes a one based index into the positional parameters of the
+request. Returns the deleted Value.
+
+=item add_parameter()
+
+add_parameter() takes a Value object as its sole argument and appends it to the
+end of the parameters of the request.
+
+=back
+
+=head1 Notes
+
+Request is actually a subclass of POE::Filter::XML::Node and so all of its
+methods, including XML::LibXML::Element's, are available for use. This could 
+ultimately be useful to avoid marshalling all of the data out of the Node and
+instead apply an XPATH expression to target specifically what is desired deep
+within a nested structure.
+
+The reason the parameter methods are one based indexed is because of how XPATH
+works and what the spec calls out for when it comes to the position() 
+predicate.
+
+=head1 AUTHOR
+
+Copyright 2009 Nicholas Perez.
+Licensed and distributed under the GPL.
 
 =cut
 
