@@ -287,7 +287,7 @@ sub put()
 
 POE::Filter::XML::RPC - A POE Filter for marshalling XML-RPC
 
-				my $params = $children->{'params'}->getChildrenByTagName('*');
+=head1 SYNOPSIS
 
     use POE::Filter::XML::RPC;
     use POE::Filter::XML::RPC::Request;
