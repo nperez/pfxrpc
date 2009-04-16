@@ -8,6 +8,8 @@ BEGIN
     use_ok('POE::Filter::XML');
     use_ok('POE::Filter::XML::RPC');
     use_ok('POE::Filter::XML::RPC::Value');
+    use_ok('POE::Filter::XML::RPC');
+    use_ok('POE::Filter::XML::RPC::Value');
 }
 
 my $filter = POE::Filter::XML::RPC->new();
