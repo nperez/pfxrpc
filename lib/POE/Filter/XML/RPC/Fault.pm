@@ -7,7 +7,7 @@ use POE::Filter::XML::RPC::Value;
 
 use base('POE::Filter::XML::Node');
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new()
 {

@@ -1,6 +1,6 @@
 ---
 name: POE-Filter-XML-RPC
-version: 0.01
+version: 0.02
 author:
   - 'Nicholas R. Perez <nperez@cpan.org>'
 abstract: A high level abstraction for (de)serializing XML-RPC requests
@@ -8,27 +8,27 @@ license: gpl
 resources:
   license: http://opensource.org/licenses/gpl-license.php
 build_requires:
-  POE: 0
-  POE::Filter::XML: 0
-  Regexp::Common::time: 0
-  Test::More: 0
+  POE: 1.003
+  POE::Filter::XML: 0.35
+  Regexp::Common::time: 0.04
+  Test::More: 0.8
   perl: 5.01
 provides:
   POE::Filter::XML::RPC:
     file: lib/POE/Filter/XML/RPC.pm
-    version: 0.01
+    version: 0.02
   POE::Filter::XML::RPC::Fault:
     file: lib/POE/Filter/XML/RPC/Fault.pm
-    version: 0.01
+    version: 0.02
   POE::Filter::XML::RPC::Request:
     file: lib/POE/Filter/XML/RPC/Request.pm
-    version: 0.01
+    version: 0.02
   POE::Filter::XML::RPC::Response:
     file: lib/POE/Filter/XML/RPC/Response.pm
-    version: 0.01
+    version: 0.02
   POE::Filter::XML::RPC::Value:
     file: lib/POE/Filter/XML/RPC/Value.pm
-    version: 0.01
+    version: 0.02
 generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

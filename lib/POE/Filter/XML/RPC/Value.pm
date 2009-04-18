@@ -9,7 +9,7 @@ use Class::InsideOut(':std');
 use Scalar::Util('looks_like_number', 'reftype');
 use Regexp::Common('time');
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant 
 {

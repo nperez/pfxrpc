@@ -1,2 +1,6 @@
+2009-04-17 NPEREZ <nperez@cpan.org>
+	* Version: 0.02
+	* Update Build.PL to make sure we have the right level modules installed
+
 2009-04-16 NPEREZ <nperez@cpan.org>
 	* Initial version: 0.01

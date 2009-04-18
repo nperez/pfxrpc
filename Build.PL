@@ -10,10 +10,10 @@ my $builder = Module::Build->new(
 	dist_abstract		=> 'A high level abstraction for (de)serializing XML-RPC requests',
     create_readme       => 1,
     build_requires => {
-        'Test::More'		    => 0,
-		'POE'				    => 0,
-		'POE::Filter::XML'	    => 0,
-        'Regexp::Common::time'  => 0,
+        'Test::More'		    => 0.8,
+		'POE'				    => 1.003,
+		'POE::Filter::XML'	    => 0.35,
+        'Regexp::Common::time'  => 0.04,
         'perl'                  => 5.010
     },
     add_to_cleanup      => [ 'POE-Filter-XML-RPC-*' ],
