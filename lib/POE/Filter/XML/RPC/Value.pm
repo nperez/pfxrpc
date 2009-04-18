@@ -5,11 +5,11 @@ use warnings;
 use strict;
 
 use base('POE::Filter::XML::Node', 'Exporter');
-use Class::InsideOut(':std');
 use Scalar::Util('looks_like_number', 'reftype');
 use Regexp::Common('time');
+use Hash::Util('fieldhash');
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant 
 {
@@ -29,8 +29,6 @@ use constant
 
 our @EXPORT= qw/ ARRAY BASE64 BOOL DATETIME DOUBLE INT STRING STRUCT /;
 
-private 'type' => my %type;
-
 sub new
 {
 	my $class = shift(@_);
@@ -39,9 +37,8 @@ sub new
     
     my $val = process($arg, $force_type);
     bless($val, $class);
-    register($val);
 
-    $type{id($val)} = $force_type // determine_type($arg);
+    $val->_type($force_type // determine_type($arg));
     return $val;
 }
 
@@ -91,7 +88,7 @@ sub value()
         $self->removeChild($self->firstChild());
         my $type = $force_type // determine_type($arg);
         $self->appendChild($type)->appendText($arg);
-        $type{id($self)} = $type;
+        $self->_type($type);
     }
     else
     {
@@ -149,25 +146,39 @@ sub node_to_value
 sub type()
 {
     my $self = shift(@_);
-   $DB::single = 1; 
-    if(!exists($type{id($self)}) || !defined($type{id($self)}))
+    if(!defined($self->_type()))
     {
         my $content = $self->findvalue('child::text()');
         
         if(defined($content) && length($content))
         {
             # string
-            $type{id($self)} = +STRING;
+            $self->_type(+STRING);
             return +STRING;
         }
         
         my $determined = determine_type($self->value());
-        $type{id($self)} = $determined;
+        $self->_type($determined);
         return $determined;
     }
     else
     {
-        return $type{id($self)};
+        return $self->_type();
+    }
+}
+
+sub _type()
+{
+    my ($self, $arg) = (shift(@_), shift(@_));
+    fieldhash state %type;
+
+    if(defined($arg))
+    {
+        $type{$self} = $arg;
+    }
+    else
+    {
+        return $type{$self};
     }
 }
 
@@ -285,6 +296,17 @@ as a reference to that type, while all other types will be return as a scalar.
 value() can also take a new value to replace the old one. It can even be of a 
 different type. And again if the heuristics for your data don't do the right 
 thing, you can also provide a second argument of what type the data should be.
+
+=back
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item _type()
+
+_type() stores the cached type of the current Value with examining the content
+to determine if that still holds true. Use with care.
 
 =back
 

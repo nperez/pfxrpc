@@ -1,6 +1,5 @@
 package POE::Filter::XML::RPC::Request;
 
-use 5.010;
 use warnings;
 use strict;
 
@@ -8,7 +7,7 @@ use POE::Filter::XML::Node;
 
 use base('POE::Filter::XML::Node');
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new()
 {
