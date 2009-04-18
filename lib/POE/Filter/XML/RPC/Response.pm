@@ -5,8 +5,6 @@ use strict;
 
 use base('POE::Filter::XML::Node');
 
-our $VERSION = '0.01';
-
 sub new()
 {
 	my ($class, $arg) = @_;
@@ -138,8 +136,6 @@ If the response contains a return Value, it will be returned. May also take a
 single argument of another Value object. In that case, any previous Value 
 object will be replaced with the provided. Also, if the response contained a 
 Fault, it will be replaced by the Value.
-
-=back
 
 =head1 NOTES
 

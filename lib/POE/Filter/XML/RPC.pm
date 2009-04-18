@@ -296,7 +296,7 @@ POE::Filter::XML::RPC - A POE Filter for marshalling XML-RPC
     use POE::Filter::XML::RPC::Value;
 
     my $filter = POE::Filter::XML::RPC->new();
-
+    
     # Build/send a request
     my $request = POE::Filter::XML::RPC::Request->new
     (
@@ -307,7 +307,7 @@ POE::Filter::XML::RPC - A POE Filter for marshalling XML-RPC
     $filter->put($request);
 
     # Build/send a response
-
+    
     my $reponse = POE::Filter::XML::RPC::Response->new
     (
         POE::Filter::XML::RPC::Value->new([qw/somevalue1 somevalue2/])
@@ -335,8 +335,6 @@ their individual PODs for more information.
 This filter only implements part of the XMLRPC spec[1], the HTTP portion is not
 accounted for within this filter and in fact, only concerns itself with 
 POE::Filter::XML::Nodes received or sent.
-
-[1]: http://www.xmlrpc.com/spec
 
 =head1 AUTHOR
 

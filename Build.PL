@@ -14,7 +14,6 @@ my $builder = Module::Build->new(
 		'POE'				    => 0,
 		'POE::Filter::XML'	    => 0,
         'Regexp::Common::time'  => 0,
-        'perl'                  => 5.010
     },
     add_to_cleanup      => [ 'POE-Filter-XML-RPC-*' ],
 );

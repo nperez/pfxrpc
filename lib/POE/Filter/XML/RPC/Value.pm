@@ -9,8 +9,6 @@ use Class::InsideOut(':std');
 use Scalar::Util('looks_like_number', 'reftype');
 use Regexp::Common('time');
 
-our $VERSION = '0.01';
-
 use constant 
 {
     'ARRAY'     => 'array',
@@ -222,7 +220,7 @@ sub determine_type($)
 POE::Filter::XML::RPC::Value - Represents XMLRPC value types
 
 =head1 SYNOPSIS
-
+    
     use 5.010;
     use POE::Filter::XML::RPC::Value;
 
