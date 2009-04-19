@@ -1,3 +1,8 @@
+2009-04-19 NPEREZ <nperez@cpan.org>
+	* Version: 0.04
+	* Adjust given/when usage in Value.pm to account for potential issues
+		against blead perl for smart match changes.
+
 2009-04-18 NPEREZ <nperez@cpan.org>
 	* Version: 0.03
 	* Switch to git and github for the repo

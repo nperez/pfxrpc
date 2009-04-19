@@ -9,7 +9,7 @@ use Scalar::Util('looks_like_number', 'reftype');
 use Regexp::Common('time');
 use Hash::Util('fieldhash');
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant 
 {
@@ -185,7 +185,7 @@ sub _type()
 sub determine_type($)
 {
     my $arg = shift(@_);
-    
+
     given($arg)
     {
         when(m@^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$@)
@@ -196,31 +196,37 @@ sub determine_type($)
         {
             return +BOOL;
         }
-        when(looks_like_number($_))
+    }
+
+    if(looks_like_number($arg))
+    {
+        if($arg =~ /\.{1}/)
         {
-            if($_ =~ /\.{1}/)
-            {
-                return +DOUBLE;
-            }
-            else
-            {
-                return +INT;
-            }
+            return +DOUBLE;
         }
-        when((reftype($_) // '') eq 'ARRAY')
+        else
+        {
+            return +INT;
+        }
+    }
+
+    given(reftype($arg) // '')
+    {
+        when('ARRAY')
         {
             return +ARRAY;
         }
-        when((reftype($_) // '') eq 'HASH')
+        when('HASH')
         {
             return +STRUCT;
         }
-        when($_ =~ $RE{'time'}{'iso'})
-        {
-            return +DATETIME;
-        }
         default
         {
+            state $iso = "$RE{'time'}{'iso'}";
+            if($arg =~ /$iso/)
+            {
+                return +DATETIME;
+            }
             return +STRING;
         }
     }
